@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume ATS Tracker</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 30px; 
+      background-color: #f9f9f9; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+    }
+    .container { 
+      background: #fff; 
+      padding: 30px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    }
+    .form-section { 
+      margin-bottom: 25px; 
+      padding: 20px; 
+      border: 1px solid #e0e0e0; 
+      border-radius: 8px; 
+      background-color: #fafafa; 
+    }
+    .form-section h3 { 
+      margin-top: 0; 
+      color: #333; 
+      border-bottom: 2px solid #1976d2; 
+      padding-bottom: 10px; 
+    }
+    textarea, input[type=file] { 
+      width: 100%; 
+      margin-top: 10px; 
+      padding: 10px; 
+      border: 1px solid #ddd; 
+      border-radius: 6px; 
+      font-size: 14px; 
+    }
+    .radio-group { 
+      margin: 15px 0; 
+    }
+    .radio-group input[type=radio] { 
+      margin-right: 8px; 
+      width: auto; 
+    }
+    .radio-group label { 
+      margin-right: 20px; 
+      font-weight: normal; 
+    }
+    button { 
+      margin-top: 20px; 
+      padding: 12px 25px; 
+      background: #1976d2; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      font-size: 16px; 
+      cursor: pointer; 
+      width: 100%; 
+    }
+    button:hover { 
+      background: #155a9c; 
+    }
+    .output { 
+      margin-top: 30px; 
+      background: #e3f2fd; 
+      padding: 25px; 
+      border-radius: 8px; 
+      border-left: 4px solid #1976d2; 
+    }
+    .error { 
+      color: red; 
+      margin-top: 20px; 
+      padding: 15px; 
+      background-color: #ffebee; 
+      border-radius: 6px; 
+      border-left: 4px solid #f44336; 
+    }
+    .job-recommendations { 
+      background: #f1f8e9; 
+      border-left: 4px solid #4caf50; 
+    }
+    .result-item { 
+      margin-bottom: 15px; 
+      padding: 10px; 
+      background: white; 
+      border-radius: 6px; 
+      border: 1px solid #e0e0e0; 
+    }
+    .result-label { 
+      font-weight: bold; 
+      color: #333; 
+      display: inline-block; 
+      min-width: 140px; 
+    }
+    .hidden { 
+      display: none; 
+    }
+  </style>
+  <script>
+    function toggleJobInput() {
+      const textInput = document.getElementById('text-input');
+      const fileInput = document.getElementById('file-input');
+      const textRadio = document.getElementById('job-text');
+      const fileRadio = document.getElementById('job-file');
+      
+      if (textRadio.checked) {
+        textInput.classList.remove('hidden');
+        fileInput.classList.add('hidden');
+        document.getElementById('job_description').required = true;
+        document.getElementById('job_description_file').required = false;
+      } else {
+        textInput.classList.add('hidden');
+        fileInput.classList.remove('hidden');
+        document.getElementById('job_description').required = false;
+        document.getElementById('job_description_file').required = true;
+      }
+    }
+  </script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Resume ATS Tracker</h1>
+  <p>Upload your resume and job description to get an AI-powered analysis and job recommendations.</p>
+  
+  <form action="/analyze" method="POST" enctype="multipart/form-data">
+    
+    <!-- Job Description Section -->
+    <div class="form-section">
+      <h3>📋 Job Description</h3>
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="job_input_type" value="text" id="job-text" checked onclick="toggleJobInput()">
+          Enter job description as text
+        </label>
+        <label>
+          <input type="radio" name="job_input_type" value="file" id="job-file" onclick="toggleJobInput()">
+          Upload job description PDF
+        </label>
+      </div>
+      
+      <div id="text-input">
+        <label for="job_description"><b>Job Description Text:</b></label>
+        <textarea id="job_description" name="job_description" rows="8" 
+                  placeholder="Paste the complete job description here including requirements, responsibilities, and qualifications..." 
+                  required></textarea>
+      </div>
+      
+      <div id="file-input" class="hidden">
+        <label for="job_description_file"><b>Upload Job Description (PDF):</b></label>
+        <input type="file" id="job_description_file" name="job_description_file" accept=".pdf">
+      </div>
+    </div>
+    
+    <!-- Resume Section -->
+    <div class="form-section">
+      <h3>📄 Resume</h3>
+      <label for="resume"><b>Upload Resume (PDF):</b></label>
+      <input type="file" id="resume" name="resume" accept=".pdf" required>
+    </div>
+
+    <button type="submit">🔍 Analyze Resume</button>
+  </form>
+
+{% if result %}
+  <div class="output">
+    <h3>📊 Analysis Results</h3>
+    <div class="result-item">
+      <span class="result-label">Match:</span> {{ result["Job Description Match"] }}
+    </div>
+    <div class="result-item">
+      <span class="result-label">Confidence Score:</span> {{ result["Confidence Score"] }}%
+    </div>
+    <div class="result-item">
+      <span class="result-label">Hiring Decision:</span> {{ result["Should I hire them or not?"] }}
+    </div>
+    <div class="result-item">
+      <span class="result-label">Missing Skills:</span> {{ result["Missing Keywords and Skills"] | join(", ") }}
+    </div>
+    <div class="result-item">
+      <span class="result-label">Profile Summary:</span> {{ result["Profile Summary"] }}
+    </div>
+  </div>
+{% endif %}
+
+{% if recommendations %}
+  <div class="output job-recommendations">
+    <h3>💼 Job Recommendations Based on Your Resume</h3>
+    <p>Here are some job opportunities that match your profile:</p>
+    <ul>
+      {% for job in recommendations %}
+        <li style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 4px;">{{ job }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if error %}
+  <div class="error"><b>⚠️ Error:</b> {{ error }}</div>
+{% endif %}
+
+</div>
+</body>
+</html>
