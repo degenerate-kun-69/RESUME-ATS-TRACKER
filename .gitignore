@@ -1,2 +1,6 @@
 .env
 /env
+/routes/__pycache__/
+/__pycache__
+/llm/__pycache__/
+/services/__pycache__/
