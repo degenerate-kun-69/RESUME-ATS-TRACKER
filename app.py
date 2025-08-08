@@ -1,12 +1,19 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
-from flask import Flask, request, jsonify
+from flask import Flask
+from routes.main_routes import main as main_blueprint
+from routes.api_routes import api as api_blueprint
 import os
-import streamlit as st
-from langchain_community.chat_models import ChatGoogleGenerativeAI
-from langchain_google_genai import GoogleGenerativeAI
-import google.generativeai as genai
-import faiss
-import pymupdf
+
+def create_app():
+    app = Flask(__name__)
+    app.config['UPLOAD_FOLDER'] = './instance/temp'
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    # Register Blueprints
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(api_blueprint)
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True, host='0.0.0.0', port=5000)
