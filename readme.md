@@ -1,0 +1,1 @@
+# save resume instead of JD in faiss vector store.
