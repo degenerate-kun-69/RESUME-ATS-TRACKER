@@ -207,3 +207,77 @@ This project is licensed under the terms specified in the LICENSE file.
 - Integration with job boards APIs
 - Resume parsing for structured data extraction
 - Multi-language support
+
+# to do : 
+make the LLM parse the 1. Job Description Parsing
+
+The ATS scans the job description and extracts key skills, qualifications, experience requirements, and industry-specific keywords.
+
+These can include:
+
+Hard skills (e.g., Python, Azure, TensorFlow)
+
+Soft skills (e.g., leadership, communication)
+as
+Certifications (e.g., AWS Certified Solutions Architect)
+
+Tools & technologies (e.g., Jira, Figma)
+
+2. Resume Parsing
+
+Your resume is broken down into structured data:
+
+Contact info
+
+Work experience
+
+Education
+
+Skills list
+
+Certifications, etc.
+
+3. Keyword Matching & Weighting
+
+The ATS compares the extracted keywords from your resume to those in the job description.
+
+Matching is weighted — not all keywords count equally.
+For example:
+
+"Python" in Skills section might get full points.
+
+"Python" buried in a job description might get less weight.
+
+Multiple mentions in contextually relevant places increase weight.
+
+4. Context & Placement
+
+Some ATS score higher if:
+
+Keywords appear in relevant sections (e.g., listing “Machine Learning” under Skills and describing it in Experience).
+
+The format is ATS-friendly (no images, tables, or unusual fonts that break parsing).
+
+5. Additional Factors
+
+Depending on the ATS, the score may also consider:
+
+Experience match (years of experience in required skills)
+
+Education match (degree type, field of study)
+
+Certifications match
+
+Job title match
+
+Industry/domain relevance
+
+6. Final Score Calculation
+
+Most ATS produce a score like this:
+
+Keyword match score (50–70% weight)
+
+Experience & qualification match (20–30% weight)
+
+Formatting & ATS-readability score (10–20% weight)

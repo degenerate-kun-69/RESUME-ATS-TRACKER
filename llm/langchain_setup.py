@@ -84,10 +84,10 @@ def evaluate_resume(resume:str, job_description:str, vector_store_param=None)-> 
         similarity_percentage = 50.0  # Default fallback
 
     # confidence score calculation
-    confidence_score = confidence_score_calculation_tool.invoke(similarity_percentage)
+    confidence_score = confidence_score_calculation_tool.invoke({"similarity": similarity_percentage})
 
     #hiring decision
-    decision = hiring_decision_tool.invoke(confidence_score)
+    decision = hiring_decision_tool.invoke({"confidence": confidence_score})
     
     # Get LLM response
     try:
@@ -98,14 +98,43 @@ def evaluate_resume(resume:str, job_description:str, vector_store_param=None)-> 
         
         # Try to parse as JSON
         import json
+        import re
         try:
+            # First try direct JSON parsing
             llm_response = json.loads(llm_response_text)
         except json.JSONDecodeError:
-            # If not valid JSON, create a fallback response
-            llm_response = {
-                "Missing Keywords and Skills": ["Unable to parse - please check resume format"],
-                "Profile Summary": llm_response_text[:500] + "..." if len(llm_response_text) > 500 else llm_response_text
-            }
+            try:
+                # Try to extract JSON from markdown code blocks
+                json_match = re.search(r'```json\s*(\{.*?\})\s*```', llm_response_text, re.DOTALL)
+                if json_match:
+                    llm_response = json.loads(json_match.group(1))
+                else:
+                    # Try to find any JSON-like structure
+                    json_match = re.search(r'\{[^{}]*"Missing Keywords and Skills"[^{}]*\}', llm_response_text, re.DOTALL)
+                    if json_match:
+                        llm_response = json.loads(json_match.group(0))
+                    else:
+                        raise json.JSONDecodeError("No valid JSON found", llm_response_text, 0)
+            except json.JSONDecodeError:
+                # If still can't parse, try to extract information manually
+                missing_skills = []
+                profile_summary = llm_response_text
+                
+                # Try to extract missing skills list
+                skills_match = re.search(r'Missing Keywords and Skills[\'"]?\s*:\s*\[(.*?)\]', llm_response_text, re.DOTALL)
+                if skills_match:
+                    skills_text = skills_match.group(1)
+                    missing_skills = [skill.strip().strip('"\'') for skill in skills_text.split(',') if skill.strip()]
+                
+                # Try to extract profile summary
+                summary_match = re.search(r'Profile Summary[\'"]?\s*:\s*[\'"]([^\'\"]*)[\'"]', llm_response_text, re.DOTALL)
+                if summary_match:
+                    profile_summary = summary_match.group(1)
+                
+                llm_response = {
+                    "Missing Keywords and Skills": missing_skills if missing_skills else ["Analysis completed - see profile summary"],
+                    "Profile Summary": profile_summary[:1000] + "..." if len(profile_summary) > 1000 else profile_summary
+                }
     except Exception as e:
         print(f"Warning: LLM analysis failed: {e}")
         llm_response = {

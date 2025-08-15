@@ -62,14 +62,8 @@ def analyze_resume():
         # Extract resume content using LangChain method
         resume_text = extract_text_from_pdf(resume_path)
 
-        # Run classification using LangChain
-        input_data = {
-            "resume": resume_text,
-            "job_description": job_description
-        }
-        
-        classification_response = classifier_chain.invoke(input_data)
-        classification_result = parse_json_response(classification_response)
+        # Run classification using our service
+        classification_result = classify_resume(resume_text, job_description)
 
         # Generate job recommendations based on the actual job description
         recommendations = generate_job_recommendations(job_description, resume_text)
