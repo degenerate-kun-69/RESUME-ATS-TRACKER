@@ -1,4 +1,5 @@
-# Resume ATS (Applicant Tracking System) T## 🛠️ Technology Stack
+# Resume ATS (Applicant Tracking System) 
+## Technology Stack
 
 - **Backend**: Flask (Python)
 - **AI/ML**: LangChain, Google Gemini AI, FAISS Vector Store
