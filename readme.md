@@ -1,353 +1,342 @@
-# Resume ATS (Applicant Tracking System) 
-## Technology Stack
+# Advanced Resume ATS Tracker
 
-- **Backend**: Flask (Python)
-- **AI/ML**: LangChain, Google Gemini AI, FAISS Vector Store
-- **Data Processing**: PyMuPDF, Pydantic (structured data validation)
-- **Analysis** : Google Gemini, FAISS
-## How It Works
+A sophisticated AI-powered Applicant Tracking System (ATS) that provides professional-grade resume analysis using cutting-edge machine learning technologies. Built with LangChain, Google Gemini AI, and FAISS vector search to deliver industry-standard recruitment insights.
 
-1. **Document Processing**: Advanced extraction fro## 🔮 Future Enhancements
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Flask](https://img.shields.io/badge/Flask-3.1.1-green.svg)
+![LangChain](https://img.shields.io/badge/LangChain-0.3.27-purple.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-- **Advanced Analytics Dashboard**: Comprehensive reporting and trend analysis
-- **Bulk Resume Processing**: Batch analysis capabilities for HR departments
-- **Custom Scoring Weights**: Configurable industry-specific scoring parameters
-- **Integration APIs**: Connectors for popular ATS platforms (Workday, Greenhouse, etc.)
-- **Multi-Language Support**: Analysis in multiple languages with localized keywords
-- **Resume Builder Integration**: AI-powered resume optimization suggestions
-- **Video Resume Analysis**: Transcription and soft skills assessment
-- **Bias Detection**: Algorithmic fairness monitoring and reporting
-- **Advanced Document Formats**: Support for DOCX, LinkedIn profiles, and web portfolios
-- **Real-time Collaboration**: Multi-user analysis and commenting system
+## Key Features
 
-## Advanced Features in Current Version
+### **Advanced ATS Analysis**
+- **Multi-Factor Scoring**: Weighted evaluation using industry-standard ATS criteria
+- **Semantic Similarity**: FAISS vector search for deep content understanding  
+- **Keyword Intelligence**: 5000+ categorized keywords with fuzzy matching
+- **Structured Data Extraction**: Pydantic-validated parsing of resumes and job descriptions
 
-### **Keyword Analysis Engine**
-- **5000+ Industry Keywords**: Comprehensive database across tech, business, and soft skills
-- **Fuzzy Matching**: Handles abbreviations, variations, and compound terms
-- **Section-Weight Optimization**: Strategic placement scoring for ATS optimization
-- **Context Awareness**: Evaluates keyword usage context and relevance
+### **AI-Powered Insights**
+- **Google Gemini Integration**: State-of-the-art language model analysis
+- **Section-Weighted Scoring**: Strategic evaluation of resume sections
+- **Experience Matching**: Relevance assessment for career progression
+- **ATS Readability**: Format optimization recommendations
 
-### **Scoring Algorithm Details**
-- **Multi-Factor Weighting**: Configurable industry-standard weights
-- **Penalty System**: Intelligent score adjustments based on performance thresholds
-- **Bonus Mechanisms**: Rewards for exceptional keyword matching and experience alignment
-- **Normalized Scaling**: Ensures consistent 0-100% scoring regardless of input variation
-
-### **Data Extraction & Structuring**
-- **Pydantic Validation**: Type-safe data extraction with automatic error handling
-- **Entity Recognition**: Advanced extraction of contact info, experience, education
-- **Metadata Preservation**: Maintains document context and analysis history
-- **JSON Schema Compliance**: Standardized output format for integrationsumes and job descriptions with metadata preservation
-2. **Structured Analysis**: Pydantic-based parsing into standardized schemas for consistent data handling
-3. **Multi-Vector Similarity**: FAISS semantic matching combined with keyword-based analysis
-4. **Weighted Scoring**: Industry-standard ATS scoring with configurable weights and penalty modifiers
-5. **Entity Indexing**: Automatic extraction and storage of skills, tools, and certifications for improved matching
-6. **Decision Logic**: Threshold-based hiring recommendations with confidence intervals*: 
-  - Advanced ATS keyword analyzer with 5 category classification
-  - Weighted confidence scoring algorithm
-  - Semantic similarity matching with distance optimization
-- **Frontend**: HTML, CSS, JavaScript
-- **Environment**: Python Virtual Environment
-
-## How the Advanced ATS Analysis Works
-
-### **1. Structured Data Extraction**
-- **Resume Parsing**: Extracts contact info, work experience, education, skills, and certifications
-- **Job Description Parsing**: Identifies required skills, experience, education, and industry keywords
-- **Entity Classification**: Categorizes elements into hard skills, soft skills, tools, and certifications
-
-### **2. Multi-Dimensional Keyword Analysis**
-- **5-Category Classification**: Hard skills, soft skills, certifications, tools, experience terms
-- **Fuzzy Matching**: Handles variations and abbreviations (ML vs Machine Learning)
-- **Section-Weighted Scoring**: Skills section (1.0x), Experience (0.9x), Projects (0.8x), etc.
-- **Context Relevance**: Evaluates keyword placement and context
-
-### **3. Advanced Scoring Algorithm**
+### **Professional Scoring System**
 ```
-Final Score = (Keyword_Match × 0.60) + (Experience_Match × 0.25) + (ATS_Readability × 0.15)
-
-With penalty adjustments:
-- Keyword score < 40%: Apply 0.7x modifier
-- Experience score < 50%: Apply 0.85x modifier  
-- Overall score < 30%: Apply 0.8x modifier
-- Excellent performance (>85% + keyword >80%): Apply 1.05x bonus
+Final Score = Keyword Match (60%) + Experience Match (25%) + ATS Readability (15%)
 ```
+- **Penalty System**: Intelligent adjustments for low performance areas
+- **Bonus Rewards**: Recognition for exceptional keyword alignment
+- **Threshold-Based Decisions**: Configurable hiring recommendations
 
-### **4. Intelligent Vector Store Management**
-- **Auto-Indexing**: Automatically adds analyzed resumes and job descriptions
-- **Entity Extraction**: Indexes individual skills, tools, and certifications
-- **Optimized Similarity**: Uses `1/(1+distance)` mapping for stable percentage scores
-- **Dynamic Knowledge Base**: Continuously improves matching accuracy
-An advanced AI-powered web application that provides industry-standard ATS analysis of resumes against job descriptions using LangChain, Google's Gemini AI, FAISS vector similarity search, and comprehensive keyword analysis. The system delivers professional-grade evaluation with weighted scoring, structured data extraction, and detailed recommendations.
-
-## Features
-
-### **Core ATS Analysis**
-- **Advanced Keyword Analysis**: Industry-standard ATS keyword matching with weighted scoring across multiple categories
-- **Structured Data Extraction**: Professional parsing of both resumes and job descriptions using Pydantic schemas
-- **Multi-Factor Scoring**: Weighted confidence scoring based on:
-  - Keyword Matching (60% weight)
-  - Experience Relevance (25% weight) 
-  - ATS Readability (15% weight)
-- **FAISS Vector Search**: Semantic similarity matching with optimized distance-to-percentage conversion
-- **Entity Indexing**: Automatic extraction and indexing of skills, certifications, and tools
-
-### **Professional Analysis Components**
-- **Resume Analysis**: Upload PDF resumes and get comprehensive AI-powered analysis
-- **Job Description Matching**: Compare resumes against job descriptions (text or PDF)
-- **Missing Skills Detection**: Identifies gaps in candidate qualifications with categorization
-- **Hiring Recommendations**: AI-driven hiring decisions with industry-standard thresholds
-- **Job Recommendations**: Suggests relevant positions based on resume content
-- **ATS Readability Score**: Evaluates resume format for ATS parsing compatibility
-
-### **Technical Features**
-- **Robust JSON Parsing**: Pydantic-based structured output with fallback mechanisms
-- **Dynamic Vector Store**: Auto-expanding knowledge base with resume and job description indexing
-- **API Endpoints**: RESTful API for programmatic integration
-- **Web Interface**: Clean, responsive Flask web application(Applicant Tracking System) Tracker
-
-An AI-powered web application that analyzes resumes against job descriptions using LangChain, Google's Gemini AI, and FAISS vector similarity search. The system provides match scores, identifies missing skills, and offers hiring recommendations.
-
-## Features
-
-- **Resume Analysis**: Upload PDF resumes and get AI-powered analysis
-- **Job Description Matching**: Compare resumes against job descriptions (text or PDF)
-- **FAISS Vector Search**: Uses vector similarity for accurate matching
-- **Missing Skills Detection**: Identifies gaps in candidate qualifications
-- **Hiring Recommendations**: AI-driven hiring decisions with confidence scores
-- **Job Recommendations**: Suggests relevant positions based on resume content
-- **Web Interface**: Clean, responsive Flask web application
+### **Self-Improving Architecture**
+- **Dynamic Vector Store**: Auto-expanding knowledge base
+- **Entity Indexing**: Continuous learning from analyzed documents
+- **Performance Optimization**: Cached embeddings and smart retrieval
 
 ## Technology Stack
 
-- **Backend**: Flask (Python)
-- **AI/ML**: LangChain, Google Gemini AI, FAISS
-- **Document Processing**: PyMuPDF
-- **Frontend**: HTML, CSS, JavaScript
-- **Environment**: Python Virtual Environment
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Backend** | Flask 3.1.1 | Web application framework |
+| **AI Engine** | Google Gemini 2.5-Pro | Advanced language processing |
+| **Vector Search** | FAISS | Semantic similarity matching |
+| **Data Validation** | Pydantic 2.11.7 | Type-safe structured parsing |
+| **Document Processing** | PyMuPDF 1.26.3 | PDF text extraction |
+| **Orchestration** | LangChain 0.3.27 | AI workflow management |
+| **Frontend** | HTML5/CSS3/JavaScript | Responsive web interface |
 
-## Prerequisites
+## Quick Start
 
+### Prerequisites
 - Python 3.8 or higher
-- Google API Key (for Gemini AI)
-- Git (optional, for cloning)
+- Google API key for Gemini AI
+- 4GB+ RAM (recommended for vector operations)
 
-## Installation & Setup
+### Installation
 
-### 1. Clone the Repository
-
+1. **Clone the repository**
 ```bash
-git clone https://www.github.com/degenerate-kun-69/RESUME-ATS-TRACKER.git
+git clone https://github.com/degenerate-kun-69/RESUME-ATS-TRACKER.git
 cd RESUME-ATS-TRACKER
 ```
 
-### 2. Create Virtual Environment
-
+2. **Set up virtual environment**
 ```bash
-python3 -m venv env #python -m venv env for windows
-source env/bin/activate  # On Windows: env\Scripts\activate
+python3 -m venv env
+source env/bin/activate  # Windows: env\Scripts\activate
 ```
 
-### 3. Install Dependencies
-
+3. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Environment Configuration
-
-Create a `.env` file in the project root & add your Google API key to the `.env` file:
-
-```env
-GOOGLE_API_KEY=your_google_api_key_here
-```
-
-### 5. Prepare Vector Store
-
-The application now includes an **auto-optimized vector store** that creates itself on first run. However, you can enhance it by adding your own data:
-
-**Option A: Use Auto-Generated Store (Recommended)**
-- The system automatically creates an ATS-optimized vector store with industry-standard patterns
-- No additional setup required
-
-**Option B: Add Custom Data**
-```python
-from llm.langchain_setup import add_resume_to_vector_store, add_job_description_to_vector_store
-
-# Add individual resumes
-add_resume_to_vector_store(
-    resume_text="Your resume content here...",
-    metadata={"candidate_id": "123", "position": "Software Engineer"}
-)
-
-# Add job descriptions
-add_job_description_to_vector_store(
-    job_desc_text="Your job description here...",
-    metadata={"job_id": "456", "company": "TechCorp"}
-)
-```
-
-### 6. Run the Application
-
+4. **Configure environment**
 ```bash
-python3 app.py
+# Create .env file
+echo "GOOGLE_API_KEY=your_google_api_key_here" > .env
 ```
 
-The application will start on `http://127.0.0.1:5000`
+5. **Launch application**
+```bash
+python app.py
+```
 
-## Usage
+Access the application at `http://localhost:5000`
+
+## Usage Guide
 
 ### Web Interface
+1. **Upload Resume**: PDF format recommended for best parsing
+2. **Job Description**: Paste text or upload PDF
+3. **Analyze**: Get comprehensive ATS evaluation
+4. **Review Results**: Detailed scoring breakdown and recommendations
 
-1. **Access the Application**: Open `http://127.0.0.1:5000` in your browser
-
-2. **Job Description Input**:
-   - **Text Input**: Paste job description directly
-   - **PDF Upload**: Upload job description as PDF file
-
-3. **Resume Upload**: Upload candidate's resume in PDF format
-
-4. **Analysis**: Click "Analyze Resume" to get comprehensive results:
-   - **Match Scores**: Multiple percentage scores for different aspects
-   - **Confidence Score**: Industry-weighted final score
-   - **Hiring Decision**: AI recommendation with threshold-based logic
-   - **Missing Skills**: Categorized list of gaps to address
-   - **Profile Summary**: AI-generated candidate assessment
-   - **Detailed Breakdown**: Score components and structured data
-   - **Recommendations**: Actionable improvement suggestions
-
-### API Endpoints
-
-The application provides comprehensive API endpoints for programmatic integration:
-
-**Resume Analysis**
-- `POST /api/analyze` - Full resume analysis with structured output
-  ```json
-  {
+### API Integration
+```bash
+curl -X POST http://localhost:5000/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
     "resume_text": "Your resume content...",
     "job_description": "Job requirements..."
-  }
-  ```
-
-**Health Check**
-- `GET /health` - Application health status
-
-**API Response Structure**
-```json
-{
-  "success": true,
-  "analysis": {
-    "Match": "78.5%",
-    "Confidence Score": 82.3,
-    "Hiring Decision": "Hire",
-    "Missing Keywords and Skills": ["kubernetes", "docker"],
-    "Profile Summary": "Strong candidate with relevant experience...",
-    "Score Breakdown": {
-      "Keyword Matching (60% weight)": "78.5%",
-      "Experience Match (25% weight)": "85.0%",
-      "ATS Readability (15% weight)": "90.0%"
-    },
-    "Detailed Analysis": { /* Structured data */ }
-  }
-}
+  }'
 ```
 
-## Project Structure
+## Project Architecture
 
 ```
-langchain-resume-ats/
-├── app.py                 # Flask application entry point
-├── config.py             # Configuration and environment variables
-├── requirements.txt      # Python dependencies
-├── .env                  # Environment variables (create this)
-├── vector_store/         # FAISS vector store (create this)
-├── instance/
-│   └── temp/            # Temporary file storage
-├── llm/
-│   ├── langchain_setup.py  # Advanced ATS engine with Pydantic schemas
-│   └── tools.py           # Keyword analyzer and scoring tools
-├── routes/
-│   ├── main_routes.py     # Web interface routes
-│   └── api_routes.py      # API endpoints
-├── services/
-│   ├── classification.py  # Resume classification orchestrator
-│   ├── extraction.py      # PDF text extraction utilities
-│   ├── parser.py         # JSON response parsing with fallbacks
-│   └── recommender.py    # Job recommendation engine
-└── templates/
-    └── index.html        # Web interface template
+resume-ats-tracker/
+├── app.py                     # Flask application entry point
+├── config.py                  # Environment configuration
+├── requirements.txt           # Python dependencies
+├── .env                       # API keys (create this)
+│
+├── llm/                       # AI Engine Core
+│   ├── langchain_setup.py     # Advanced ATS analysis engine
+│   └── tools.py              # Keyword analyzer & scoring tools
+│
+├── routes/                    # Web & API Routes
+│   ├── main_routes.py         # Web interface endpoints
+│   └── api_routes.py          # RESTful API endpoints
+│
+├── services/                  # Business Logic
+│   ├── classification.py     # Resume classification
+│   ├── extraction.py         # PDF text extraction
+│   ├── parser.py             # Response parsing
+│   └── recommender.py        # Job recommendations
+│
+├── templates/                 # Web Interface
+│   └── index.html            # Main application UI
+│
+├── instance/                  # Runtime Data
+│   └── temp/                 # Temporary file storage
+│
+└── vector_store/             # AI Knowledge Base
+    ├── index.faiss          # Vector embeddings
+    └── index.pkl            # Metadata store
 ```
 
 ## How It Works
 
-1. **Document Processing**: Extracts text from PDF resumes and job descriptions
-2. **Vector Similarity**: Uses FAISS to calculate similarity between resume and job description
-3. **AI Analysis**: Gemini AI analyzes qualitative aspects and identifies missing skills
-4. **Scoring**: Combines vector similarity with AI confidence scoring
-5. **Decision Making**: Provides hiring recommendations based on threshold scoring
+### 1. Document Processing Pipeline
+```python
+# PDF text extraction with metadata preservation
+resume_text = extract_text_from_pdf(file_path)
+job_desc_text = parse_job_description(input_data)
+```
+
+### 2. Multi-Dimensional Analysis
+```python
+# Structured data extraction using Pydantic schemas
+parsed_data = classifier_chain.invoke({
+    "resume": resume_text,
+    "job_description": job_description
+})
+
+# Advanced keyword analysis with 5 categories
+keyword_analysis = ats_keyword_analyzer.invoke({
+    "resume_text": resume_text,
+    "job_description": job_description
+})
+```
+
+### 3. Intelligent Scoring Algorithm
+```python
+# Weighted confidence calculation
+confidence_score = (
+    keyword_match_score * 0.60 +      # Primary ATS factor
+    experience_match * 0.25 +         # Career relevance
+    ats_readability * 0.15            # Format optimization
+)
+```
+
+### 4. Vector Similarity Matching
+```python
+# Semantic search with optimized distance conversion
+similarity_results = vector_store.similarity_search_with_score(query, k=1)
+similarity_percentage = 1.0 / (1.0 + distance) * 100
+```
+
+## Analysis Output
+
+### Comprehensive Scoring Report
+```json
+{
+  "Match": "78.5%",
+  "Confidence Score": 82.3,
+  "Hiring Decision": "Hire",
+  "Missing Keywords": ["kubernetes", "docker", "microservices"],
+  "Profile Summary": "Strong full-stack developer with relevant experience...",
+  "Score Breakdown": {
+    "Keyword Matching (60%)": "78.5%",
+    "Experience Match (25%)": "85.0%", 
+    "ATS Readability (15%)": "90.0%"
+  },
+  "Detailed Analysis": {
+    "hard_skills": ["python", "javascript", "react"],
+    "soft_skills": ["teamwork", "problem-solving"],
+    "certifications": ["aws certified"],
+    "experience_years": "3-5 years"
+  }
+}
+```
+
+### Visual Feedback
+- **Match Percentage**: Direct keyword alignment
+- **Confidence Score**: Weighted final evaluation
+- **Hiring Recommendation**: Threshold-based decision
+- **Improvement Areas**: Specific skill gaps identified
+- **ATS Optimization**: Format and structure suggestions
+
+## Advanced Features
+
+### Keyword Analysis Engine
+- **5000+ Industry Terms**: Comprehensive technology and business vocabulary
+- **Fuzzy Matching**: Handles variations (ML ↔ Machine Learning)
+- **Context Awareness**: Evaluates keyword placement relevance
+- **Section Weighting**: Skills (1.0x), Experience (0.9x), Projects (0.8x)
+
+### Dynamic Learning System
+- **Auto-Indexing**: Builds knowledge from each analysis
+- **Entity Extraction**: Catalogs skills, tools, and certifications
+- **Pattern Recognition**: Improves matching accuracy over time
+- **Vector Store Growth**: Expanding semantic understanding
+
+### Professional Data Handling
+- **Type Safety**: Pydantic validation for all data structures
+- **Error Recovery**: Graceful handling of malformed inputs
+- **Structured Output**: Consistent JSON schema for integrations
+- **Metadata Tracking**: Analysis history and context preservation
 
 ## Troubleshooting
 
 ### Common Issues
 
-**1. "No module named 'google.generativeai'"**
+**API Key Configuration**
 ```bash
-pip install google-generativeai
+# Verify .env file exists and contains valid key
+cat .env
+export GOOGLE_API_KEY="your_key_here"
 ```
 
-**2. "vector_store not found"**
-- The system now auto-creates an optimized vector store on first run
-- If issues persist, delete the `vector_store` directory and restart the application
+**Vector Store Initialization**
+```bash
+# Clear and rebuild vector store if corrupted
+rm -rf vector_store/
+python app.py  # Will auto-create optimized store
+```
 
-**3. "Confidence score and match are identical"**
-- **Fixed**: Now uses weighted multi-factor scoring algorithm
-- Match shows keyword similarity, Confidence shows weighted final score
-- Different scores indicate proper ATS-standard evaluation
+**PDF Processing Errors**
+- Ensure PDFs are not password-protected
+- Check file size (recommended < 10MB)
+- Verify PyMuPDF installation: `pip install pymupdf`
 
-**4. "Missing keywords not properly categorized"**
-- The enhanced analyzer now categorizes missing skills by type
-- Provides specific recommendations for each category
+**Memory Issues**
+- Increase system RAM allocation
+- Use smaller batch sizes for bulk processing
+- Clear vector store cache periodically
 
-**3. "GOOGLE_API_KEY not found"**
-- Verify your `.env` file exists and contains the API key
-- Ensure the key is valid and has proper permissions
+## Configuration
 
-**4. PDF processing errors**
-- Ensure uploaded PDFs are not corrupted or password-protected
-- Check that PyMuPDF is properly installed
-- The system now handles OCR-scanned PDFs better
+### Environment Variables
+```bash
+# Required
+GOOGLE_API_KEY=your_google_api_key
 
-**5. "JSON parsing errors"**
-- **Fixed**: Robust Pydantic-based parsing with multiple fallback strategies
-- System handles malformed LLM responses gracefully
-- Structured output guaranteed even with API failures
+# Optional
+UPLOAD_FOLDER=./instance/temp
+DEBUG_MODE=True
+MAX_FILE_SIZE=10485760  # 10MB
+```
 
-### Performance Tips
+### Scoring Weights (Customizable)
+```python
+SCORING_WEIGHTS = {
+    'keyword_match': 0.60,    # Primary ATS factor
+    'experience_match': 0.25, # Career relevance  
+    'ats_readability': 0.15   # Format quality
+}
+```
 
-- **Vector Store Optimization**: The auto-generated store improves with each analysis
-- **API Efficiency**: Batch multiple analyses to leverage cached embeddings
-- **Keyword Matching**: System now handles 1000+ industry-standard keywords and variations
-- **Memory Management**: Entity indexing is optimized for production use
-- **Response Time**: Pydantic schemas reduce parsing overhead significantly
+## 🚀 Performance Optimization
+
+### Best Practices
+- **Batch Processing**: Group multiple analyses for efficiency
+- **Caching**: Leverage embedded vector cache for repeated queries
+- **Resource Management**: Monitor memory usage with large document sets
+- **API Limits**: Implement rate limiting for Google Gemini calls
+
+### Production Deployment
+- Use WSGI server (Gunicorn) instead of Flask dev server
+- Configure reverse proxy (Nginx) for static file serving
+- Implement proper logging and monitoring
+- Set up automated vector store backups
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+### Development Setup
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run tests
+python -m pytest tests/
+
+# Code formatting
+black . && isort .
+```
 
 ## License
 
-This project is licensed under the terms specified in the LICENSE file.
+This project is licensed under the GNU General Public License - see the [LICENSE](LICENSE) file for details.
 
-## Future Enhancements
+## Roadmap
 
-- Support for additional document formats (DOCX, TXT)
-- Batch processing capabilities
-- Enhanced job recommendation algorithms
-- Integration with job boards APIs
-- Resume parsing for structured data extraction
-- Multi-language support
+### Upcoming Features
+- [ ] **Bulk Processing**: Batch resume analysis for HR departments
+- [ ] **Custom Weights**: Industry-specific scoring configurations
+- [ ] **Advanced Analytics**: Comprehensive reporting dashboard
+- [ ] **API Integrations**: Connectors for major ATS platforms
+- [ ] **Multi-Language**: Support for international job markets
+
+### Long-term Vision
+- [ ] **Video Resume Analysis**: AI-powered soft skills assessment
+- [ ] **Bias Detection**: Algorithmic fairness monitoring
+- [ ] **Real-time Collaboration**: Multi-user analysis workflows
+- [ ] **Mobile Application**: Native iOS/Android apps
+- [ ] **Enterprise Features**: SSO, audit logs, compliance tools
+
+## 📞 Support
+
+- **Documentation**: [Wiki](https://github.com/degenerate-kun-69/RESUME-ATS-TRACKER/wiki)
+- **Issues**: [GitHub Issues](https://github.com/degenerate-kun-69/RESUME-ATS-TRACKER/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/degenerate-kun-69/RESUME-ATS-TRACKER/discussions)
+
+---
