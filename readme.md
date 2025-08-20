@@ -5,7 +5,6 @@ A sophisticated AI-powered Applicant Tracking System (ATS) that provides profess
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.1.1-green.svg)
 ![LangChain](https://img.shields.io/badge/LangChain-0.3.27-purple.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Key Features
 
