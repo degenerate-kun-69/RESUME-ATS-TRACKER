@@ -3,7 +3,8 @@
 - **Backend**: Flask (Python)
 - **AI/ML**: LangChain, Google Gemini AI, FAISS Vector Store
 - **Data Processing**: PyMuPDF, Pydantic (structured data validation)
-- **Analysis ## 🔍 How It Works
+- **Analysis**
+## How It Works
 
 1. **Document Processing**: Advanced extraction fro## 🔮 Future Enhancements
 
@@ -18,7 +19,7 @@
 - **Advanced Document Formats**: Support for DOCX, LinkedIn profiles, and web portfolios
 - **Real-time Collaboration**: Multi-user analysis and commenting system
 
-## 📊 Advanced Features in Current Version
+## Advanced Features in Current Version
 
 ### **Keyword Analysis Engine**
 - **5000+ Industry Keywords**: Comprehensive database across tech, business, and soft skills
@@ -48,7 +49,7 @@
 - **Frontend**: HTML, CSS, JavaScript
 - **Environment**: Python Virtual Environment
 
-## 🔍 How the Advanced ATS Analysis Works
+## How the Advanced ATS Analysis Works
 
 ### **1. Structured Data Extraction**
 - **Resume Parsing**: Extracts contact info, work experience, education, skills, and certifications
@@ -79,7 +80,7 @@ With penalty adjustments:
 - **Dynamic Knowledge Base**: Continuously improves matching accuracy
 An advanced AI-powered web application that provides industry-standard ATS analysis of resumes against job descriptions using LangChain, Google's Gemini AI, FAISS vector similarity search, and comprehensive keyword analysis. The system delivers professional-grade evaluation with weighted scoring, structured data extraction, and detailed recommendations.
 
-## 🚀 Features
+## Features
 
 ### **Core ATS Analysis**
 - **Advanced Keyword Analysis**: Industry-standard ATS keyword matching with weighted scoring across multiple categories
