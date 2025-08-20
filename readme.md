@@ -4,7 +4,7 @@
 - **Backend**: Flask (Python)
 - **AI/ML**: LangChain, Google Gemini AI, FAISS Vector Store
 - **Data Processing**: PyMuPDF, Pydantic (structured data validation)
-- **Analysis**
+- **Analysis** : Google Gemini, FAISS
 ## How It Works
 
 1. **Document Processing**: Advanced extraction fro## 🔮 Future Enhancements
