@@ -4,8 +4,7 @@ from services.parser import parse_json_response
 
 api = Blueprint('api', __name__)
 
-# Import limiter from app (will be initialized)
-from app import limiter
+from extensions import limiter
 
 @api.route('/api/analyze', methods=['POST'])
 @limiter.limit("10 per minute")

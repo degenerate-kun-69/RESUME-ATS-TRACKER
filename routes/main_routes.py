@@ -10,8 +10,7 @@ import asyncio
 
 main = Blueprint('main', __name__)
 
-# Import limiter from app
-from app import limiter
+from extensions import limiter
 
 @main.route('/')
 async def index():
