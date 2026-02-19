@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - develop
+      - toolcall
   pull_request:
     branches:
       - main
       - develop
+      - toolcall
   workflow_dispatch:
 
 env:
@@ -48,7 +50,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=v1.0.${{ github.run_number }}
 
