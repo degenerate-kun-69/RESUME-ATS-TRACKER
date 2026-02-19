@@ -1,12 +1,8 @@
-from flask import Blueprint, request, render_template, redirect, url_for, Flask, current_app
+from flask import Blueprint, request, render_template, redirect, url_for, current_app
 import os
-from config import UPLOAD_FOLDER
 from services.extraction import extract_text_from_pdf
 from services.classification import classify_resume_async
-from services.parser import parse_json_response
 from services.recommender import generate_job_recommendations_async
-from llm.langchain_setup import classifier_chain
-import asyncio
 
 main = Blueprint('main', __name__)
 
