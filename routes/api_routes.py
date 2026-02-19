@@ -1,11 +1,9 @@
 from flask import Blueprint, request, jsonify
 from services.classification import classify_resume_async
 from services.parser import parse_json_response
+from extensions import limiter
 
 api = Blueprint('api', __name__)
-
-# Import limiter from app (will be initialized)
-from app import limiter
 
 @api.route('/api/analyze', methods=['POST'])
 @limiter.limit("10 per minute")

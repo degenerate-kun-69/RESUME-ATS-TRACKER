@@ -1,3 +1,4 @@
+import asyncio
 import redis
 import json
 import hashlib
@@ -8,7 +9,7 @@ from typing import Optional, Callable, Any
 # Redis connection
 redis_client: Optional[redis.Redis] = None
 
-def init_redis(host: str = None, port: int = None, db: int = 0) -> redis.Redis:
+def init_redis(host: str = None, port: int = None, db: int = 0) -> Optional[redis.Redis]:
     """Initialize Redis connection"""
     global redis_client
     
@@ -61,8 +62,8 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             cache_key = generate_cache_key(prefix, *args, **kwargs)
             
             try:
-                # Try to get from cache
-                cached_value = redis_client.get(cache_key)
+                # Offload synchronous Redis call to a thread to avoid blocking the event loop
+                cached_value = await asyncio.to_thread(redis_client.get, cache_key)
                 if cached_value:
                     print(f"✓ Cache hit for {prefix}")
                     return json.loads(cached_value)
@@ -73,8 +74,8 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             result = await func(*args, **kwargs)
             
             try:
-                # Store in cache
-                redis_client.setex(cache_key, ttl, json.dumps(result))
+                # Offload synchronous Redis call to a thread to avoid blocking the event loop
+                await asyncio.to_thread(redis_client.setex, cache_key, ttl, json.dumps(result))
                 print(f"✓ Cache stored for {prefix}")
             except Exception as e:
                 print(f"⚠ Cache write error: {e}")
@@ -107,7 +108,6 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             return result
         
         # Return appropriate wrapper based on whether function is async
-        import asyncio
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
@@ -120,10 +120,22 @@ def clear_cache_pattern(pattern: str = "*"):
         return 0
     
     try:
-        keys = redis_client.keys(pattern)
-        if keys:
-            return redis_client.delete(*keys)
-        return 0
+        total_deleted = 0
+        batch_size = 500
+        batch = []
+
+        # Use scan_iter to avoid blocking Redis on large keyspaces
+        for key in redis_client.scan_iter(match=pattern):
+            batch.append(key)
+            if len(batch) >= batch_size:
+                total_deleted += redis_client.delete(*batch)
+                batch = []
+
+        # Delete any remaining keys in the last batch
+        if batch:
+            total_deleted += redis_client.delete(*batch)
+
+        return total_deleted
     except Exception as e:
         print(f"⚠ Cache clear error: {e}")
         return 0
