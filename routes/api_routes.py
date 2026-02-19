@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.classification import classify_resume_async
 from services.parser import parse_json_response
-import asyncio
 
 api = Blueprint('api', __name__)
 
