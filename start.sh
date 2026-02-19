@@ -16,9 +16,13 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
-    echo " Docker Compose is not installed. Please install Docker Compose first."
+# Detect docker compose command (prefer plugin over legacy binary)
+if docker compose version &> /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+else
+    echo " Neither 'docker compose' plugin nor 'docker-compose' binary found."
     echo "   Visit: https://docs.docker.com/compose/install/"
     exit 1
 fi
@@ -48,22 +52,22 @@ echo ""
 
 # Build and start services
 echo "  Building Docker images..."
-docker-compose build
+$DOCKER_COMPOSE build
 
 echo ""
 echo " Starting services..."
-docker-compose up -d
+$DOCKER_COMPOSE up -d
 
 echo ""
 echo " Waiting for services to be healthy..."
 sleep 5
 
 # Check if services are running
-if docker-compose ps | grep -q "Up"; then
+if $DOCKER_COMPOSE ps | grep -q "Up"; then
     echo " Services are running!"
     echo ""
     echo " Service Status:"
-    docker-compose ps
+    $DOCKER_COMPOSE ps
     echo ""
     echo " Access the application:"
     echo "   Web Interface: http://localhost:5000"
@@ -71,12 +75,12 @@ if docker-compose ps | grep -q "Up"; then
     echo "   Health Check:  http://localhost:5000/health"
     echo ""
     echo " Useful Commands:"
-    echo "   View logs:        docker-compose logs -f"
-    echo "   Stop services:    docker-compose down"
-    echo "   Restart services: docker-compose restart"
+    echo "   View logs:        $DOCKER_COMPOSE logs -f"
+    echo "   Stop services:    $DOCKER_COMPOSE down"
+    echo "   Restart services: $DOCKER_COMPOSE restart"
     echo ""
     echo " Documentation: See DOCKER_SETUP.md for detailed information"
 else
-    echo " Services failed to start. Check logs with: docker-compose logs"
+    echo " Services failed to start. Check logs with: $DOCKER_COMPOSE logs"
     exit 1
 fi
