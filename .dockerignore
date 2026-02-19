@@ -40,6 +40,7 @@ MANIFEST
 Dockerfile
 docker-compose.yml
 .dockerignore
+.env
 
 # Documentation
 readme.md
