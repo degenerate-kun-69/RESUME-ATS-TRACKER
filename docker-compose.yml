@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    container_name: resume-ats-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - resume-ats-network
+
+  # Resume ATS Tracker Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: resume-ats-tracker
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_ENV=production
+      - WORKERS=4
+      - THREADS=2
+      - TIMEOUT=120
+    volumes:
+      - ./instance:/app/instance
+      - ./temp:/app/temp
+      - ./vector_store:/app/vector_store
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - resume-ats-network
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  resume-ats-network:
+    driver: bridge
