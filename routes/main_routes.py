@@ -1,20 +1,20 @@
-from flask import Blueprint, request, render_template, redirect, url_for, Flask, current_app
+from flask import Blueprint, request, render_template, redirect, url_for, current_app
 import os
-from config import UPLOAD_FOLDER
 from services.extraction import extract_text_from_pdf
-from services.classification import classify_resume
+from services.classification import classify_resume_async
 from services.parser import parse_json_response
-from services.recommender import generate_job_recommendations
-from llm.langchain_setup import classifier_chain
+from services.recommender import generate_job_recommendations_async
+from extensions import limiter
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
-def index():
+async def index():
     return render_template('index.html')
 
 @main.route('/analyze', methods=['POST'])
-def analyze_resume():
+@limiter.limit("5 per minute")
+async def analyze_resume():
     # Same logic as your main route, refactored to call service functions
     if 'resume' not in request.files:
         return redirect(url_for('index'))
@@ -62,11 +62,11 @@ def analyze_resume():
         # Extract resume content using LangChain method
         resume_text = extract_text_from_pdf(resume_path)
 
-        # Run classification using our service
-        classification_result = classify_resume(resume_text, job_description)
+        # Run classification using our async service
+        classification_result = await classify_resume_async(resume_text, job_description)
 
         # Generate job recommendations based on the actual job description
-        recommendations = generate_job_recommendations(job_description, resume_text)
+        recommendations = await generate_job_recommendations_async(job_description, resume_text)
 
         # Clean up temporary file
         os.remove(resume_path)

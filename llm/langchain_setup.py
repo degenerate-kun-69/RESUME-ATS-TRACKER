@@ -490,3 +490,18 @@ def evaluate_resume(resume: str, job_description: str, vector_store_param=None) 
     }
 
     return final_result
+
+
+async def evaluate_resume_async(resume: str, job_description: str, vector_store_param=None) -> dict:
+    """
+    Async version: Enhanced ATS-style resume evaluation with comprehensive parsing and weighted scoring.
+    """
+    import asyncio
+    
+    # Run the synchronous evaluation in an executor to avoid blocking
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(
+        None,
+        lambda: evaluate_resume(resume, job_description, vector_store_param)
+    )
+    return result
