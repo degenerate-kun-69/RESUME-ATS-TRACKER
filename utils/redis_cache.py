@@ -1,3 +1,4 @@
+import asyncio
 import redis
 import json
 import hashlib
@@ -61,8 +62,8 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             cache_key = generate_cache_key(prefix, *args, **kwargs)
             
             try:
-                # Try to get from cache
-                cached_value = redis_client.get(cache_key)
+                # Try to get from cache (offload blocking I/O to thread pool)
+                cached_value = await asyncio.to_thread(redis_client.get, cache_key)
                 if cached_value:
                     print(f"✓ Cache hit for {prefix}")
                     return json.loads(cached_value)
@@ -73,8 +74,8 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             result = await func(*args, **kwargs)
             
             try:
-                # Store in cache
-                redis_client.setex(cache_key, ttl, json.dumps(result))
+                # Store in cache (offload blocking I/O to thread pool)
+                await asyncio.to_thread(redis_client.setex, cache_key, ttl, json.dumps(result))
                 print(f"✓ Cache stored for {prefix}")
             except Exception as e:
                 print(f"⚠ Cache write error: {e}")
@@ -107,7 +108,6 @@ def cache_result(prefix: str = "cache", ttl: int = 3600):
             return result
         
         # Return appropriate wrapper based on whether function is async
-        import asyncio
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
