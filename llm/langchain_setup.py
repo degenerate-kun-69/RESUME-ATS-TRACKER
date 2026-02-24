@@ -1,8 +1,10 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Callable
 from uuid import uuid4
 import os
 import re
 import json
+import threading
+import numpy as np
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import PromptTemplate
@@ -16,6 +18,42 @@ import google.generativeai as genai
 from llm.tools import confidence_score_calculation_tool, hiring_decision_tool
 
 genai.configure(api_key=GOOGLE_API_KEY)
+
+# -------------------------
+# Thread-safe vector store lock & input-sanitization helpers
+# -------------------------
+_vector_store_lock = threading.Lock()
+
+# Regex covering the most common prompt-injection patterns found in uploaded docs.
+_INJECTION_PATTERN = re.compile(
+    r'(ignore\s+(previous|all|above)\s+(instructions?|prompts?|context)'
+    r'|<\s*/?\s*system\s*>'
+    r'|disregard\s+(all\s+)?(previous\s+)?instructions?)',
+    re.IGNORECASE
+)
+
+
+def _sanitize_input(text: str, max_chars: int = 15000) -> str:
+    """Truncate and strip prompt-injection patterns before the text reaches the LLM."""
+    if not text:
+        return ""
+    text = text[:max_chars]
+    text = _INJECTION_PATTERN.sub("[REDACTED]", text)
+    return text
+
+
+def _add_and_save_documents(docs: List) -> None:
+    """Thread-safe: add documents to the global FAISS store and persist to disk."""
+    global vector_store
+    if not docs:
+        return
+    with _vector_store_lock:
+        try:
+            vector_store.add_documents(docs)
+            vector_store.save_local(vector_store_path)
+        except Exception as exc:
+            print(f"Warning: Failed to add/save documents to vector store: {exc}")
+
 
 # LLM and embeddings
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.15)
@@ -274,8 +312,8 @@ def _index_entities_from_analysis(analysis: AnalysisSchema, context: Dict[str, A
         docs.append(Document(page_content=f"tool: {tool}", metadata={**context, "entity_type": "tool", "source": "job_description"}))
 
     if docs:
-        vector_store.add_documents(docs)
-        vector_store.save_local(vector_store_path)
+        # Issue 4: use thread-safe helper to prevent concurrent-write corruption.
+        _add_and_save_documents(docs)
         print(f"Indexed {len(docs)} structured entities into vector store.")
 
 def _extract_entities_from_single_text(text: str, source_type: str) -> Dict[str, List[str]]:
@@ -327,8 +365,7 @@ def _index_single_text_entities(text: str, meta: Dict[str, Any]):
         docs.append(Document(page_content=f"tool: {tool}", metadata={**meta, "entity_type": "tool"}))
 
     if docs:
-        vector_store.add_documents(docs)
-        vector_store.save_local(vector_store_path)
+        _add_and_save_documents(docs)
         print(f"Indexed {len(docs)} {source_type} entities into vector store.")
 
 # -------------------------
@@ -347,8 +384,7 @@ def add_resume_to_vector_store(resume_text: str, metadata: dict = None):
 
     try:
         resume_doc = Document(page_content=resume_text, metadata=metadata)
-        vector_store.add_documents([resume_doc])
-        vector_store.save_local(vector_store_path)
+        _add_and_save_documents([resume_doc])
         print("Resume added to vector store successfully")
         _index_single_text_entities(resume_text, metadata)
     except Exception as e:
@@ -367,8 +403,7 @@ def add_job_description_to_vector_store(job_desc_text: str, metadata: dict = Non
 
     try:
         job_doc = Document(page_content=job_desc_text, metadata=metadata)
-        vector_store.add_documents([job_doc])
-        vector_store.save_local(vector_store_path)
+        _add_and_save_documents([job_doc])
         print("Job description added to vector store successfully")
         _index_single_text_entities(job_desc_text, metadata)
     except Exception as e:
@@ -377,22 +412,41 @@ def add_job_description_to_vector_store(job_desc_text: str, metadata: dict = Non
 # -------------------------
 # Main evaluation
 # -------------------------
-def evaluate_resume(resume: str, job_description: str, vector_store_param=None) -> dict:
+def evaluate_resume(resume: str, job_description: str, vector_store_param=None, progress_callback: Optional[Callable] = None) -> dict:
     """
     Enhanced ATS-style resume evaluation with comprehensive parsing and weighted scoring.
+
+    Args:
+        progress_callback: optional callable(step: str, message: str, percent: int)
+            invoked at each major stage so callers can stream progress to the client.
     """
+    # Issue 7: sanitize inputs to prevent prompt-injection from malicious PDFs.
+    resume = _sanitize_input(resume)
+    job_description = _sanitize_input(job_description)
+
     vs = vector_store_param if vector_store_param is not None else vector_store
 
-    # 1. Calculate FAISS similarity (bounded conversion)
+    # 1. Compute direct cosine similarity between resume and JD embeddings.
+    #    (Issue 3: the old code compared the JD against seed templates, not the resume.)
+    if progress_callback:
+        progress_callback("similarity", "Computing semantic similarity...", 20)
     try:
-        faiss_similarity = vs.similarity_search_with_score(job_description, k=1)
-        _, distance = faiss_similarity[0]
-        base_similarity = _distance_to_similarity_percent(distance)
+        resume_vec = np.array(embedding_model.embed_query(resume[:4000]))
+        jd_vec = np.array(embedding_model.embed_query(job_description[:4000]))
+        norm_r = np.linalg.norm(resume_vec)
+        norm_j = np.linalg.norm(jd_vec)
+        if norm_r > 0 and norm_j > 0:
+            cosine_sim = float(np.dot(resume_vec, jd_vec) / (norm_r * norm_j))
+        else:
+            cosine_sim = 0.5
+        base_similarity = max(0.0, min(100.0, cosine_sim * 100.0))
     except Exception as e:
-        print(f"Warning: FAISS similarity calculation failed: {e}")
+        print(f"Warning: Direct cosine similarity calculation failed: {e}")
         base_similarity = 50.0
 
     # 2. ATS keyword analysis
+    if progress_callback:
+        progress_callback("keywords", "Analyzing keywords...", 40)
     from llm.tools import ats_keyword_analyzer
     try:
         keyword_analysis = ats_keyword_analyzer.invoke({
@@ -407,6 +461,8 @@ def evaluate_resume(resume: str, job_description: str, vector_store_param=None) 
         missing_keywords = ["Analysis temporarily unavailable"]
 
     # 3. LLM structured response (strict JSON via Pydantic parser)
+    if progress_callback:
+        progress_callback("llm", "Running AI analysis...", 60)
     try:
         llm_response: AnalysisSchema = classifier_chain.invoke({
             "resume": resume,
@@ -437,6 +493,8 @@ def evaluate_resume(resume: str, job_description: str, vector_store_param=None) 
         ats_readability = 85.0
 
     # 5. Calculate confidence score
+    if progress_callback:
+        progress_callback("scoring", "Calculating confidence score...", 85)
     confidence_score = confidence_score_calculation_tool.invoke({
         "similarity": base_similarity,
         "keyword_match_score": keyword_match_score,
@@ -497,9 +555,10 @@ async def evaluate_resume_async(resume: str, job_description: str, vector_store_
     Async version: Enhanced ATS-style resume evaluation with comprehensive parsing and weighted scoring.
     """
     import asyncio
-    
-    # Run the synchronous evaluation in an executor to avoid blocking
-    loop = asyncio.get_event_loop()
+
+    # Issue 1: get_event_loop() is deprecated in Python 3.10+; use get_running_loop().
+    # This correctly retrieves the loop that is *already running* in the async context.
+    loop = asyncio.get_running_loop()
     result = await loop.run_in_executor(
         None,
         lambda: evaluate_resume(resume, job_description, vector_store_param)

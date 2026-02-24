@@ -97,6 +97,40 @@
     .hidden { 
       display: none; 
     }
+    /* Issue 10 – SSE progress overlay */
+    #progress-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .progress-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px 44px;
+      width: 380px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+    }
+    .progress-box h3 { margin: 0 0 20px; color: #1976d2; font-size: 18px; }
+    .progress-track {
+      background: #e0e0e0;
+      border-radius: 8px;
+      height: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    #progress-bar {
+      height: 100%;
+      background: #1976d2;
+      border-radius: 8px;
+      width: 5%;
+      transition: width 0.4s ease;
+    }
+    #progress-msg { color: #555; font-size: 14px; }
   </style>
   <script>
     function toggleJobInput() {
@@ -164,6 +198,8 @@
     <button type="submit">🔍 Analyze Resume</button>
   </form>
 
+  <!-- results-area: written by Jinja2 on full-page loads OR replaced by SSE JS -->
+  <div id="results-area">
 {% if result %}
   <div class="output">
     <h3>📊 Analysis Results</h3>
@@ -200,7 +236,122 @@
 {% if error %}
   <div class="error"><b>⚠️ Error:</b> {{ error }}</div>
 {% endif %}
+  </div><!-- /#results-area -->
 
-</div>
+  <!-- Progress overlay (Issue 10) -->
+  <div id="progress-overlay">
+    <div class="progress-box">
+      <h3>🔍 Analyzing Resume…</h3>
+      <div class="progress-track"><div id="progress-bar"></div></div>
+      <p id="progress-msg">Starting analysis…</p>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<script>
+(function () {
+  const form = document.querySelector('form');
+  if (!form || !window.fetch || !window.ReadableStream) return; // no-JS / old-browser fallback
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const overlay  = document.getElementById('progress-overlay');
+    const bar      = document.getElementById('progress-bar');
+    const msg      = document.getElementById('progress-msg');
+    const area     = document.getElementById('results-area');
+
+    overlay.style.display = 'flex';
+    bar.style.width = '5%';
+    msg.textContent = 'Starting analysis…';
+    area.innerHTML  = '';
+
+    fetch('/analyze/stream', { method: 'POST', body: formData })
+      .then(function (resp) {
+        if (!resp.ok || !resp.body) throw new Error('Server error ' + resp.status);
+        const reader  = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        function pump() {
+          reader.read().then(function ({ done, value }) {
+            if (done) { overlay.style.display = 'none'; return; }
+            buffer += decoder.decode(value, { stream: true });
+
+            // SSE frames are delimited by double newlines
+            const frames = buffer.split('\n\n');
+            buffer = frames.pop(); // keep incomplete tail
+
+            frames.forEach(function (frame) {
+              if (!frame.trim()) return;
+              let eventType = 'message', dataStr = '';
+              frame.split('\n').forEach(function (line) {
+                if (line.startsWith('event: '))      eventType = line.slice(7).trim();
+                else if (line.startsWith('data: ')) dataStr   = line.slice(6).trim();
+              });
+              if (!dataStr) return;
+              try {
+                const data = JSON.parse(dataStr);
+                if (eventType === 'progress') {
+                  bar.style.width  = (data.percent || 0) + '%';
+                  msg.textContent  = data.message || '';
+                } else if (eventType === 'result') {
+                  overlay.style.display = 'none';
+                  area.innerHTML = buildResultHTML(data.result, data.recommendations);
+                } else if (eventType === 'error') {
+                  overlay.style.display = 'none';
+                  area.innerHTML = '<div class="error"><b>⚠️ Error:</b> ' +
+                    escHtml(data.error || 'Unknown error') + '</div>';
+                }
+              } catch (_) {}
+            });
+            pump();
+          });
+        }
+        pump();
+      })
+      .catch(function (err) {
+        overlay.style.display = 'none';
+        area.innerHTML = '<div class="error"><b>⚠️ Error:</b> ' + escHtml(err.message) + '</div>';
+      });
+  });
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function buildResultHTML(result, recommendations) {
+    if (!result) return '';
+    const missing = Array.isArray(result['Missing Keywords and Skills'])
+      ? result['Missing Keywords and Skills'].join(', ')
+      : (result['Missing Keywords and Skills'] || '');
+    let html = '<div class="output"><h3>📊 Analysis Results</h3>'
+      + '<div class="result-item"><span class="result-label">Match:</span> '
+      + escHtml(result['Job Description Match'] || result['Match'] || '') + '</div>'
+      + '<div class="result-item"><span class="result-label">Confidence Score:</span> '
+      + escHtml(String(result['Confidence Score'] || '')) + '%</div>'
+      + '<div class="result-item"><span class="result-label">Hiring Decision:</span> '
+      + escHtml(result['Hiring Decision'] || result['hiring_decision'] || result['decision'] || '') + '</div>'
+      + '<div class="result-item"><span class="result-label">Missing Skills:</span> '
+      + escHtml(missing) + '</div>'
+      + '<div class="result-item"><span class="result-label">Profile Summary:</span> '
+      + escHtml(result['Profile Summary'] || '') + '</div></div>';
+
+    if (Array.isArray(recommendations) && recommendations.length) {
+      html += '<div class="output job-recommendations">'
+        + '<h3>💼 Job Recommendations Based on Your Resume</h3>'
+        + '<p>Here are some job opportunities that match your profile:</p><ul>'
+        + recommendations.map(function (j) {
+            return '<li style="margin-bottom:10px;padding:8px;background:white;border-radius:4px;">'
+              + escHtml(j) + '</li>';
+          }).join('')
+        + '</ul></div>';
+    }
+    return html;
+  }
+}());
+</script>
+
 </body>
 </html>

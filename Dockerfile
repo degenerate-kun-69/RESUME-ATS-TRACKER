@@ -57,7 +57,7 @@ CMD gunicorn --bind 0.0.0.0:5000 \
     --workers ${WORKERS} \
     --threads ${THREADS} \
     --timeout ${TIMEOUT} \
-    --worker-class sync \
+    --worker-class gthread \
     --access-logfile - \
     --error-logfile - \
     "app:create_app()"
